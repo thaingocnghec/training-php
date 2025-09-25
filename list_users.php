@@ -2,6 +2,10 @@
 // Start the session
 session_start();
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 require_once 'models/UserModel.php';
 $userModel = new UserModel();
 
@@ -56,9 +60,13 @@ $users = $userModel->getUsers($params);
                                 <a href="view_user.php?id=<?php echo $user['id'] ?>">
                                     <i class="fa fa-eye" aria-hidden="true" title="View"></i>
                                 </a>
-                                <a href="delete_user.php?id=<?php echo $user['id'] ?>">
-                                    <i class="fa fa-eraser" aria-hidden="true" title="Delete"></i>
-                                </a>
+                                <form method="POST" action="delete_user.php?id=<?php echo $user['id']; ?>" style="display:inline;">
+                                <!-- CSRF hidden token -->
+                                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                    <button type="submit" style="border:none;background:none;color:red;cursor:pointer;">
+                                        <i class="fa fa-eraser" aria-hidden="true" title="Delete"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php } ?>
